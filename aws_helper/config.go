@@ -1,6 +1,7 @@
 package aws_helper
 
 import (
+	"github.com/alphagov/dynolocker/errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 )
@@ -12,12 +13,12 @@ func CreateAwsSession(awsRegion string) (*session.Session, error) {
 		SharedConfigState: session.SharedConfigEnable,
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStackTraceAndPrefix(err, "Error intializing session")
 	}
 
 	_, err = session.Config.Credentials.Get()
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStackTraceAndPrefix(err, "Error finding AWS credentials")
 	}
 
 	return session, nil

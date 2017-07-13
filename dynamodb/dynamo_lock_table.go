@@ -3,6 +3,7 @@ package dynamodb
 import (
 	"fmt"
 	"github.com/alphagov/dynolocker/aws_helper"
+	"github.com/alphagov/dynolocker/errors"
 	"github.com/alphagov/dynolocker/util"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -61,7 +62,7 @@ func lockTableExistsAndIsActive(tableName string, client *dynamodb.DynamoDB) (bo
 		if awsErr, isAwsErr := err.(awserr.Error); isAwsErr && awsErr.Code() == "ResourceNotFoundException" {
 			return false, nil
 		} else {
-			return false, err
+			return false, errors.WithStackTrace(err)
 		}
 	}
 
@@ -98,7 +99,7 @@ func CreateLockTable(tableName string, readCapacityUnits int, writeCapacityUnits
 		if isTableAlreadyBeingCreatedError(err) {
 			fmt.Sprintf("Looks like someone created table %s at the same time. Will wait for it to be in active state.", tableName)
 		} else {
-			return err
+			return errors.WithStackTrace(err)
 		}
 	}
 
@@ -146,7 +147,7 @@ func waitForTableToBeActiveWithRandomSleep(tableName string, client *dynamodb.Dy
 		time.Sleep(sleepBetweenRetries)
 	}
 
-	return err
+	return errors.WithStackTrace(TableActiveRetriesExceeded{TableName: tableName, Retries: maxRetries})
 }
 
 type TableActiveRetriesExceeded struct {
