@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/alphagov/dynolocker/dynamodb"
 	"github.com/urfave/cli"
 	"github.com/zencoder/ddbsync"
 	"os"
@@ -13,6 +14,9 @@ const (
 )
 
 func lock(c *cli.Context) {
+	if c.GlobalBool("create_table") {
+		dynamodb.CreateLockTableIfNecessary(c.GlobalString("table_name"), c.GlobalString("region"))
+	}
 	s := ddbsync.NewLockService(c.GlobalString("table_name"), c.GlobalString("region"), "", c.GlobalBool("disable_ssl"))
 	m := s.NewLock(c.GlobalString("lock_name"), c.GlobalInt64("lock_ttl"), DB_LOCK_RETRY)
 	m.Lock()
@@ -64,6 +68,10 @@ func main() {
 		cli.BoolFlag{
 			Name:  "disable_ssl",
 			Usage: "Disable SSL on calls to AWS (default: false)",
+		},
+		cli.BoolTFlag{
+			Name:  "create_table",
+			Usage: "If we should create the DynamoDB table (default: true)",
 		},
 	}
 	app.Commands = []cli.Command{
