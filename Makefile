@@ -26,26 +26,36 @@ cd $(1) && go test -v -parallel 128
 endef
 
 define cross_build
-mkdir -p bin/$(1)/$(2);
-GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build -o bin/$(1)/$(2)/$(PKG) -a -tags "static_build $(PKG)" -installsuffix $(PKG) ${GO_LDFLAGS_STATIC};
+mkdir -p ./bin;
+GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build -o bin/$(PKG)_$(1)_$(2) -a -tags "static_build $(PKG)" -installsuffix $(PKG) ${GO_LDFLAGS_STATIC};
 endef
 
 .PHONY: install-deps
 install-deps: ## Install deps with Glide
-	@echo "Installing deps..."
-	glide install
+	@echo "==> Installing deps..."
+	@glide install
 
 .PHONY: fmt
 fmt: ## Run gofmt over all *.go files
-	@echo "Running source files through gofmt..."
-	$(GOFMT_CMD)
+	@echo "==> Running source files through gofmt..."
+	@$(GOFMT_CMD)
 
 .PHONY: build
 build: install-deps ## build Go binary for all GOARCH
-	@echo "Building dynolocker for all GOARCH/GOOS"
-	$(foreach GOARCH,$(GOARCHS),$(foreach GOOS,$(GOOSES),$(call cross_build,$(GOOS),$(GOARCH))))
+	@echo "==> Building dynolocker for all GOARCH/GOOS..."
+	@$(foreach GOARCH,$(GOARCHS),$(foreach GOOS,$(GOOSES),$(call cross_build,$(GOOS),$(GOARCH))))
 
 .PHONY: test
 test: install-deps ## Run tests
-	@echo "Running tests..."
-	$(foreach TEST_DIR,$(TEST_DIRS),$(call test,$(TEST_DIR)))
+	@echo "==> Running tests..."
+	@$(foreach TEST_DIR,$(TEST_DIRS),$(call test,$(TEST_DIR)))
+
+check_github_token:
+	$(if ${GITHUB_OAUTH},,$(error GITHUB_OAUTH not set, please set ENV var))
+
+.PHONY: release
+release: test fmt build check_github_token ## Release to Github
+	@echo "==> Releasing binary artifacts..."
+	@sh -c  "./scripts/release.sh"
+
+export
