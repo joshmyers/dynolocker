@@ -2,30 +2,28 @@ package main
 
 import (
 	"github.com/joshmyers/dynolocker/dynamodb"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"github.com/zencoder/ddbsync"
 	"os"
 	"sort"
+	"sync"
 	"time"
 )
 
-const (
-	DB_LOCK_RETRY time.Duration = 10 * time.Second
-)
-
-func lock(c *cli.Context) {
-	if c.GlobalBool("create_table") {
-		dynamodb.CreateLockTableIfNecessary(c.GlobalString("table_name"), c.GlobalString("region"))
-	}
-	s := ddbsync.NewLockService(c.GlobalString("table_name"), c.GlobalString("region"), "", c.GlobalBool("disable_ssl"))
-	m := s.NewLock(c.GlobalString("lock_name"), c.GlobalInt64("lock_ttl"), DB_LOCK_RETRY)
+func lock(c *cli.Context, m sync.Locker) {
+	log.WithFields(log.Fields{"name": c.GlobalString("name"), "table": c.GlobalString("table")}).Debug("Locking table...")
 	m.Lock()
 }
 
-func unlock(c *cli.Context) {
-	s := ddbsync.NewLockService(c.GlobalString("table_name"), c.GlobalString("region"), "", c.GlobalBool("disable_ssl"))
-	m := s.NewLock(c.GlobalString("lock_name"), c.GlobalInt64("lock_ttl"), DB_LOCK_RETRY)
+func unlock(c *cli.Context, m sync.Locker) {
+	log.WithFields(log.Fields{"name": c.GlobalString("name"), "table": c.GlobalString("table")}).Debug("Unlocking table...")
 	m.Unlock()
+}
+
+func newDynolocker(c *cli.Context) sync.Locker {
+	s := ddbsync.NewLockService(c.GlobalString("table"), c.GlobalString("region"), "", c.GlobalBool("disable_ssl"))
+	return s.NewLock(c.GlobalString("name"), c.GlobalInt64("ttl"), c.GlobalDuration("retry"))
 }
 
 func main() {
@@ -36,19 +34,19 @@ func main() {
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
 		cli.Author{
-			Name:  "GOV.UK Pay Operations",
-			Email: "gds-team-payments-web-ops@digital.cabinet-office.gov.uk",
+			Name:  "Joshua Myers",
+			Email: "joshuajmyers@gmail.com",
 		},
 	}
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "table_name",
+			Name:   "table",
 			Value:  "dynolocker",
 			Usage:  "DynamoDB table for locks",
 			EnvVar: "DB_TABLE_NAME",
 		},
 		cli.StringFlag{
-			Name:   "lock_name",
+			Name:   "name",
 			Value:  "lock",
 			Usage:  "DynamoDB lock name",
 			EnvVar: "DB_LOCK_NAME",
@@ -59,36 +57,62 @@ func main() {
 			Usage:  "AWS region",
 			EnvVar: "AWS_DEFAULT_REGION",
 		},
+		cli.DurationFlag{
+			Name:  "retry",
+			Value: time.Second * 3,
+			Usage: "Lock reattempt wait duration",
+		},
+		cli.BoolTFlag{
+			Name:  "disable-ssl",
+			Usage: "Disable SSL on calls to AWS (default: false)",
+		},
 		cli.Int64Flag{
-			Name:   "lock_ttl",
+			Name:   "ttl",
 			Value:  60,
 			Usage:  "Lock duration",
 			EnvVar: "DB_TTL",
 		},
-		cli.BoolFlag{
-			Name:  "disable_ssl",
-			Usage: "Disable SSL on calls to AWS (default: false)",
-		},
 		cli.BoolTFlag{
-			Name:  "create_table",
-			Usage: "If we should create the DynamoDB table (default: true)",
+			Name:  "debug",
+			Usage: "Show debug output",
 		},
+	}
+	app.Before = func(c *cli.Context) error {
+		if c.GlobalBoolT("debug") {
+			log.SetLevel(log.DebugLevel)
+		}
+		return nil
 	}
 	app.Commands = []cli.Command{
 		{
-			Name:   "lock",
-			Usage:  "Create a lock",
-			Action: lock,
+			Name:  "lock",
+			Usage: "Create a lock",
+			Action: func(c *cli.Context) error {
+				if c.BoolT("create-table") {
+					dynamodb.CreateLockTableIfNecessary(c.GlobalString("table"), c.GlobalString("region"))
+				}
+				m := newDynolocker(c)
+				lock(c, m)
+				return nil
+			},
+			Flags: []cli.Flag{
+				cli.BoolTFlag{
+					Name:  "create-table",
+					Usage: "If we should create the DynamoDB table (default: true)",
+				},
+			},
 		},
 		{
-			Name:   "unlock",
-			Usage:  "Force an unlock",
-			Action: unlock,
+			Name:  "unlock",
+			Usage: "Force an unlock",
+			Action: func(c *cli.Context) error {
+				m := newDynolocker(c)
+				unlock(c, m)
+				return nil
+			},
 		},
 	}
-
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
-
 	app.Run(os.Args)
 }

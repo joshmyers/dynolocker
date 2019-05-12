@@ -2,12 +2,13 @@ package dynamodb
 
 import (
 	"fmt"
-	"github.com/joshmyers/dynolocker/aws_helper"
-	"github.com/joshmyers/dynolocker/errors"
-	"github.com/joshmyers/dynolocker/util"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/joshmyers/dynolocker/aws_helper"
+	"github.com/joshmyers/dynolocker/errors"
+	"github.com/joshmyers/dynolocker/util"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -42,13 +43,19 @@ func CreateLockTableIfNecessary(tableName, awsRegion string) error {
 		return err
 	}
 
+	log.WithFields(log.Fields{
+		"table": tableName,
+	}).Debug("Checking table exists and active...")
+
 	tableExists, err := lockTableExistsAndIsActive(tableName, dynamodbClient)
 	if err != nil {
 		return err
 	}
 
 	if !tableExists {
-		fmt.Sprintf("Lock table %s does not exist in DynamoDB. Will need to create it just this first time.", tableName)
+		log.WithFields(log.Fields{
+			"table": tableName,
+		}).Debug("Lock table does not exist in DynamoDB")
 		return CreateLockTable(tableName, DEFAULT_READ_CAPACITY_UNITS, DEFAULT_WRITE_CAPACITY_UNITS, dynamodbClient)
 	}
 
@@ -75,7 +82,9 @@ func CreateLockTable(tableName string, readCapacityUnits int, writeCapacityUnits
 	tableCreateDeleteSemaphore.Acquire()
 	defer tableCreateDeleteSemaphore.Release()
 
-	fmt.Sprintf("Creating table %s in DynamoDB", tableName)
+	log.WithFields(log.Fields{
+		"table": tableName,
+	}).Debug("Creating table...")
 
 	attributeDefinitions := []*dynamodb.AttributeDefinition{
 		&dynamodb.AttributeDefinition{AttributeName: aws.String(ATTR_LOCK_ID), AttributeType: aws.String(dynamodb.ScalarAttributeTypeS)},
@@ -97,7 +106,9 @@ func CreateLockTable(tableName string, readCapacityUnits int, writeCapacityUnits
 
 	if err != nil {
 		if isTableAlreadyBeingCreatedError(err) {
-			fmt.Sprintf("Looks like someone created table %s at the same time. Will wait for it to be in active state.", tableName)
+			log.WithFields(log.Fields{
+				"table": tableName,
+			}).Debug("Looks like someone created table at the same time. Will wait for it to be in active state...")
 		} else {
 			return errors.WithStackTrace(err)
 		}
@@ -138,12 +149,20 @@ func waitForTableToBeActiveWithRandomSleep(tableName string, client *dynamodb.Dy
 		}
 
 		if tableReady {
-			fmt.Sprintf("Success! Table %s is now in active state.", tableName)
+			log.WithFields(log.Fields{
+				"table": tableName,
+			}).Debug("Success! Table is now in an active state")
 			return nil
 		}
 
 		sleepBetweenRetries := util.GetRandomTime(sleepBetweenRetriesMin, sleepBetweenRetriesMax)
 		fmt.Sprintf("Table %s is not yet in active state. Will check again after %s.", tableName, sleepBetweenRetries)
+		log.WithFields(log.Fields{
+			"table":                 tableName,
+			"sleep_between_retries": sleepBetweenRetries,
+			"retry":                 i,
+			"max_retries":           maxRetries,
+		}).Debug("Table is not yet in active state. Retrying ...")
 		time.Sleep(sleepBetweenRetries)
 	}
 
