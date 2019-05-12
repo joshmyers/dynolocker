@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alphagov/dynolocker/errors"
+	"github.com/joshmyers/dynolocker/errors"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/stretchr/testify/assert"
 )

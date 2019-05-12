@@ -2,9 +2,9 @@ package dynamodb
 
 import (
 	"fmt"
-	"github.com/alphagov/dynolocker/aws_helper"
-	"github.com/alphagov/dynolocker/errors"
-	"github.com/alphagov/dynolocker/util"
+	"github.com/joshmyers/dynolocker/aws_helper"
+	"github.com/joshmyers/dynolocker/errors"
+	"github.com/joshmyers/dynolocker/util"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/dynamodb"

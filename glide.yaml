@@ -1,4 +1,4 @@
-package: github.com/alphagov/dynolocker
+package: github.com/joshmyers/dynolocker
 import:
 - package: github.com/urfave/cli
 - package: github.com/zencoder/ddbsync

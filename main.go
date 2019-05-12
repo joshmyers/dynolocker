@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/alphagov/dynolocker/dynamodb"
+	"github.com/joshmyers/dynolocker/dynamodb"
 	"github.com/urfave/cli"
 	"github.com/zencoder/ddbsync"
 	"os"
