@@ -13,7 +13,7 @@ VERSION:
    0.0.1
 
 AUTHOR:
-   Josh Myers <josh@joshmyers.io>
+   Joshua Myers <joshuajmyers@gmail.com>
 
 COMMANDS:
      lock     Create a lock
@@ -21,12 +21,13 @@ COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --create_table      If we should create the DynamoDB table (default: true)
-   --disable_ssl       Disable SSL on calls to AWS
-   --lock_name value   DynamoDB lock name (default: "lock") [$DB_LOCK_NAME]
-   --lock_ttl value    Lock duration (default: 60) [$DB_TTL]
-   --region value      AWS region (default: "eu-west-1") [$AWS_DEFAULT_REGION]
-   --table_name value  DynamoDB table for locks (default: "dynolocker") [$DB_TABLE_NAME]
-   --help, -h          show help
-   --version, -v       print the version
+   --debug         Show debug output
+   --disable-ssl   Disable SSL on calls to AWS (default: false)
+   --name value    DynamoDB lock name (default: "lock") [$DB_LOCK_NAME]
+   --region value  AWS region (default: "eu-west-1") [$AWS_DEFAULT_REGION]
+   --retry value   Lock reattempt wait duration (default: 3s)
+   --table value   DynamoDB table for locks (default: "dynolocker") [$DB_TABLE_NAME]
+   --ttl value     Lock duration (default: 60) [$DB_TTL]
+   --help, -h      show help
+   --version, -v   print the version
 ```
