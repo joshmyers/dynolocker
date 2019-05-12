@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/joshmyers/dynolocker/errors"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/joshmyers/dynolocker/errors"
 	"github.com/stretchr/testify/assert"
 )
 

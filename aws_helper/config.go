@@ -1,9 +1,9 @@
 package aws_helper
 
 import (
-	"github.com/joshmyers/dynolocker/errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/joshmyers/dynolocker/errors"
 )
 
 // Returns an AWS session object for the given region, ensuring that the credentials are available
