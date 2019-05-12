@@ -26,6 +26,7 @@ cd $(1) && go test -v -parallel 128
 endef
 
 define cross_build
+echo "==> Building $(PKG)_$(1)_$(2) ..."
 mkdir -p ./bin;
 GOOS=$(1) GOARCH=$(2) CGO_ENABLED=0 go build -o bin/$(PKG)_$(1)_$(2) -a -tags "static_build $(PKG)" -installsuffix $(PKG) ${GO_LDFLAGS_STATIC};
 endef
@@ -42,7 +43,6 @@ fmt: ## Run gofmt over all *.go files
 
 .PHONY: build
 build: install-deps ## build Go binary for all GOARCH
-	@echo "==> Building dynolocker for all GOARCH/GOOS..."
 	@$(foreach GOARCH,$(GOARCHS),$(foreach GOOS,$(GOOSES),$(call cross_build,$(GOOS),$(GOARCH))))
 
 .PHONY: test

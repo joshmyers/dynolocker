@@ -3,6 +3,9 @@ import:
 - package: github.com/urfave/cli
 - package: github.com/zencoder/ddbsync
 - package: github.com/go-errors/errors
+- package: golang.org/x/sys/unix
+  version: 953cdadca894
+- package: github.com/sirupsen/logrus
 - package: github.com/aws/aws-sdk-go
   subpackages:
   - aws
