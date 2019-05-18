@@ -15,7 +15,7 @@ fi
 AUTH="Authorization: token ${GITHUB_OAUTH}"
 GH_API="https://api.github.com"
 GH_ASSET_UPLOAD="https://uploads.github.com"
-GH_REPO="${GH_API}/repos/alphagov/${PKG}"
+GH_REPO="${GH_API}/repos/${GITHUB_ORG}/${PKG}"
 RELEASE_FILE=$(mktemp)
 
 # Validate token.
@@ -59,5 +59,5 @@ for bin in $(ls *"${PKG}"* | grep -v zip); do
     --data-binary @"${bin}.zip" \
     -H "${AUTH}" \
     -H "Content-Type: application/zip" \
-    "${GH_ASSET_UPLOAD}/repos/alphagov/${PKG}/releases/${release_id}/assets?name=${bin}.zip"
+    "${GH_ASSET_UPLOAD}/repos/${GITHUB_ORG}/${PKG}/releases/${release_id}/assets?name=${bin}.zip"
 done

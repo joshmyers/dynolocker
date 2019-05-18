@@ -3,6 +3,7 @@ PKG                  := dynolocker
 VERSION              := $(shell cat VERSION)
 GITCOMMIT            := $(shell git rev-parse --short HEAD)
 GITUNTRACKEDCHANGES  := $(shell git status --porcelain --untracked-files=no)
+GITHUB_ORG           := joshmyers
 
 ifneq ($(GITUNTRACKEDCHANGES),)
 GITCOMMIT := $(GITCOMMIT)-dirty
