@@ -25,12 +25,11 @@ jobs:
           key: glide-{{ checksum "glide.lock" }}
       - run:
           name: Download vendored Go dependencies
-          command: glide install
+          command: make install-deps
       - save_cache:
           key: glide-{{ checksum "glide.lock" }}
           paths:
             - vendor
       - run:
           name: Run unit tests
-          command: |
-            make test
+          command: make test
