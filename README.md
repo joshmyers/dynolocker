@@ -1,3 +1,5 @@
+[![Build Status](https://circleci.com/gh/joshmyers/dynolocker/tree/master.svg?style=svg)](https://circleci.com/gh/joshmyers/dynolocker/tree/master)
+
 ## Dynolocker
 
 A CLI tool for distributed locks using DynamoDB:
