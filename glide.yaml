@@ -1,7 +1,8 @@
 package: github.com/joshmyers/dynolocker
 import:
 - package: github.com/urfave/cli
-- package: github.com/zencoder/ddbsync
+- package: github.com/joshmyers/ddbsync
+  version: c771363
 - package: github.com/go-errors/errors
 - package: golang.org/x/sys/unix
   version: 953cdadca894

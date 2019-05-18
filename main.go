@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/joshmyers/ddbsync"
 	"github.com/joshmyers/dynolocker/dynamodb"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-	"github.com/zencoder/ddbsync"
 	"os"
 	"sort"
 	"sync"
@@ -12,12 +12,19 @@ import (
 )
 
 func lock(c *cli.Context, m sync.Locker) {
-	log.WithFields(log.Fields{"name": c.GlobalString("name"), "table": c.GlobalString("table")}).Debug("Locking table...")
+	log.WithFields(log.Fields{
+		"name":  c.GlobalString("name"),
+		"ttl":   c.GlobalInt64("ttl"),
+		"table": c.GlobalString("table")},
+	).Debug("Locking table...")
 	m.Lock()
 }
 
 func unlock(c *cli.Context, m sync.Locker) {
-	log.WithFields(log.Fields{"name": c.GlobalString("name"), "table": c.GlobalString("table")}).Debug("Unlocking table...")
+	log.WithFields(log.Fields{
+		"name":  c.GlobalString("name"),
+		"table": c.GlobalString("table")},
+	).Debug("Unlocking table...")
 	m.Unlock()
 }
 
