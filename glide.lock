@@ -1,0 +1,66 @@
+hash: a34fd8cb4681228d93a2ad66cce7510750ee9195a5127147eb940deb31b13306
+updated: 2019-05-18T16:30:17.134409+01:00
+imports:
+- name: github.com/aws/aws-sdk-go
+  version: 695fe24acaf9afe80b0ce261d4637f42ba0b4c7d
+  subpackages:
+  - aws
+  - aws/awserr
+  - aws/awsutil
+  - aws/client
+  - aws/client/metadata
+  - aws/corehandlers
+  - aws/credentials
+  - aws/credentials/ec2rolecreds
+  - aws/credentials/endpointcreds
+  - aws/credentials/stscreds
+  - aws/defaults
+  - aws/ec2metadata
+  - aws/endpoints
+  - aws/request
+  - aws/service/dynamodb
+  - aws/session
+  - aws/signer/v4
+  - private/protocol
+  - private/protocol/json/jsonutil
+  - private/protocol/jsonrpc
+  - private/protocol/query
+  - private/protocol/query/queryutil
+  - private/protocol/rest
+  - private/protocol/xml/xmlutil
+  - private/waiter
+  - service/dynamodb
+  - service/sts
+- name: github.com/davecgh/go-spew
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  subpackages:
+  - spew
+- name: github.com/go-errors/errors
+  version: 8fa88b06e5974e97fbf9899a7f86a344bfd1f105
+- name: github.com/go-ini/ini
+  version: c437d20015c2ab6454b7a66a13109ff0fb99e17a
+- name: github.com/jmespath/go-jmespath
+  version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
+- name: github.com/joshmyers/ddbsync
+  version: c771363751b88bfd00f29142dac3cef523d99d1d
+  subpackages:
+  - models
+- name: github.com/konsorten/go-windows-terminal-sequences
+  version: f55edac94c9bbba5d6182a4be46d86a2c9b5b50e
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/sirupsen/logrus
+  version: f0375eb5b588893ff556c71dee32d98e57a9b777
+- name: github.com/stretchr/testify
+  version: ffdc059bfe9ce6a4e144ba849dbedead332c6053
+  subpackages:
+  - assert
+- name: github.com/urfave/cli
+  version: 7bc6a0acffa589f415f88aca16cc1de5ffd66f9c
+- name: golang.org/x/sys
+  version: 953cdadca894cdc07be76fc99f95b40c28f06623
+  subpackages:
+  - unix
+testImports: []
