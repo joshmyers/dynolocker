@@ -47,7 +47,7 @@ build: install-deps ## build Go binary for all GOARCH
 	@$(foreach GOARCH,$(GOARCHS),$(foreach GOOS,$(GOOSES),$(call cross_build,$(GOOS),$(GOARCH))))
 
 .PHONY: test
-test: install-deps ## Run tests
+test: ## Run tests
 	@echo "==> Running tests..."
 	@$(foreach TEST_DIR,$(TEST_DIRS),$(call test,$(TEST_DIR)))
 
